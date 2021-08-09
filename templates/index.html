@@ -2,8 +2,62 @@
 {% block body %}
 <div class="container">
     <h1 class="mb-5">Welcome to game</h1>
-    <button id="createRoom" class="btn btn-primary">Create Room</button>
-    <button id="joinRoom" class="btn btn-primary">Join Room</button>
+    <button id="createBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+        Create Room
+    </button>
+    <button id="joinBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinModal">
+        Join Room
+    </button>
+    <!-- Create Room Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Create a room</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorTextCreate" class="text-danger"></p>
+                    <form id="createForm">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="createName"
+                                   placeholder="Enter your name" name="name">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="createRoom" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Join Room Modal -->
+    <div class="modal fade" id="joinModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="joinModalLabel">Join a room</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorTextJoin" class="text-danger"></p>
+                    <form id="joinForm">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="joinName"
+                                   placeholder="Enter your name" name="name">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="joinID"
+                                   placeholder="Enter room ID" name="roomID">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="joinRoom" class="btn btn-primary">Join</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- User JS -->
 <script src="/static/index.js"></script>
