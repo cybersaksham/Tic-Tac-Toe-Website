@@ -19,6 +19,32 @@ db = SQLAlchemy(app)
 socket = SocketIO(app)
 
 
+# Rooms Table
+class Rooms(db.Model):
+    __tablename__ = "rooms"
+    id = db.Column(db.Integer, primary_key=True)
+    first = db.Column(db.Integer, nullable=False)
+    second = db.Column(db.Integer)
+    status = db.Column(db.String(10), nullable=False)
+    turn = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, first):
+        self.first = first
+        self.second = None
+        self.status = "n" * 9
+        self.turn = first
+
+
+# Players Table
+class Players(db.Model):
+    __tablename__ = "players"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(10), nullable=False)
+
+    def __init__(self, name):
+        self.name = name
+
+
 @app.route('/')
 def home():
     return "Website content"
