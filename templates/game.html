@@ -4,7 +4,7 @@
     <div class="row g-2">
         {% for box in boxes %}
         <div class="col-4 text-center">
-            <div class="p-3 border bg-light">{% if box != "n" %}box{% endif %}</div>
+            <div class="p-3 border bg-light">{% if box != "n" %}{{ box | safe }}{% endif %}</div>
         </div>
         {% endfor %}
     </div>

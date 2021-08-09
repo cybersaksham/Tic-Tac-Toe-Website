@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -48,6 +48,37 @@ class Players(db.Model):
 @app.route('/')
 def home():
     return render_template("index.html")
+
+
+@app.route('/create_room', methods=["POST"])
+def create_room():
+    if request.method == "POST":
+        try:
+            # Getting data from form
+            name__ = request.form["name"]
+
+            # Making Player
+            player = Players(name__)
+            db.session.add(player)
+            db.session.commit()
+
+            # Making Room
+            room = Rooms(player.id)
+            db.session.add(room)
+            db.session.commit()
+
+            return jsonify(error=None, id=room.id)
+        except Exception as e:
+            return jsonify(error=str(e))
+
+
+@app.route('/<int:roomID>')
+def game(roomID):
+    room = db.session.query(Rooms).filter(Rooms.id == roomID).first()
+    if room is not None:
+        boxes__ = [room.status[i] for i in range(9)]
+        return render_template("game.html", boxes=boxes__)
+    return redirect('/')
 
 
 if __name__ == '__main__':

@@ -12,7 +12,20 @@ $(document).ready(function(){
             showError('#errorTextCreate', "Name must be between 4 & 10 characters");
         }
         else{
-            showError('#errorTextCreate', "")
+            showError('#errorTextCreate', "");
+            $.ajax({
+                url: '/create_room',
+                method: 'POST',
+                data: $('#createForm').serialize(),
+                success: function(res){
+                    if(res["error"] != null){
+                        showError('#errorTextCreate', res["error"]);
+                    }
+                },
+                error: function(){
+                    showError('#errorTextCreate', "Connection error. Try again.");
+                }
+            });
         }
     });
 
