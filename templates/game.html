@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container">
+    <div class="row g-2">
+        {% for box in boxes %}
+        <div class="col-4 text-center">
+            <div class="p-3 border bg-light">{% if box != "n" %}box{% endif %}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

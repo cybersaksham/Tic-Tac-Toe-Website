@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -47,7 +47,7 @@ class Players(db.Model):
 
 @app.route('/')
 def home():
-    return "Website content"
+    return render_template("index.html")
 
 
 if __name__ == '__main__':
