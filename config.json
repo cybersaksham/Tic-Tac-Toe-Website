@@ -1,0 +1,5 @@
+{
+  "debug": true,
+  "local_secret": "LOCAL_SECRET",
+  "local_database": "postgresql://postgres:postgres123@localhost/tic-tac-toe"
+}
