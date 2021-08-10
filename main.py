@@ -1,12 +1,15 @@
+# Importing Modules
 from flask import Flask, render_template, redirect, request, jsonify, session
 from flask_socketio import SocketIO, emit
 from flask_sqlalchemy import SQLAlchemy
 import json
 import os
 
+# Getting variable Configurations
 with open("config.json") as f:
     data = json.load(f)
 
+# Creating App
 app = Flask(__name__)
 if data["debug"]:
     app.secret_key = data["local_secret"]
@@ -47,6 +50,7 @@ class Players(db.Model):
         self.name = name
 
 
+# Main Route
 @app.route('/')
 def home():
     if "player" in session:
@@ -56,6 +60,7 @@ def home():
 
 @app.route('/create_room', methods=["POST"])
 def create_room():
+    # Creating new room
     if request.method == "POST":
         if "player" not in session:
             try:
@@ -83,6 +88,7 @@ def create_room():
 
 @app.route('/join_room', methods=["POST"])
 def join_room():
+    # Joining a room
     if request.method == "POST":
         if "player" not in session:
             try:
@@ -116,10 +122,10 @@ def join_room():
 
 @app.route('/<int:roomID>')
 def game(roomID):
+    # Game route
     room = db.session.query(Rooms).filter(Rooms.id == roomID).first()
     if room is not None:
         if "player" in session:
-            print(session["player"])
             player__ = session["player"]
             if room.first == player__ or room.second == player__:
                 boxes__ = [room.status[i] for i in range(9)]
@@ -134,6 +140,7 @@ def game(roomID):
 
 
 def gameLogic(status):
+    # Logic of winning or draw
     win_positions = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
                      [0, 3, 6], [1, 4, 7], [2, 5, 8],
                      [0, 4, 8], [2, 4, 6]]
@@ -150,6 +157,7 @@ def gameLogic(status):
 
 @socket.on('clickBox')
 def clickBox(id__, ind__):
+    # Clicking a box
     room_id__ = int(id__)
     room__ = db.session.query(Rooms).filter(Rooms.id == room_id__).first()
     if "player" in session:
@@ -214,6 +222,7 @@ def clickBox(id__, ind__):
 
 @socket.on('dltRoom')
 def dltRoom(id__):
+    # Deleting Room
     room_id__ = int(id__)
     room__ = db.session.query(Rooms).filter(Rooms.id == room_id__).first()
     first__ = db.session.query(Players).filter(Players.id == room__.first).first()
@@ -229,6 +238,7 @@ def dltRoom(id__):
 
 @socket.on('restartGame')
 def restartGame(id__):
+    # Restarting Game
     room_id__ = int(id__)
     room__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
     room__.update({Rooms.status: "n" * 9, Rooms.turn: room__.first().first,
@@ -239,6 +249,7 @@ def restartGame(id__):
 
 @socket.on('quitRoom')
 def quitRoom(id__):
+    # Quitting Room
     room_id__ = int(id__)
     room__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
     second__ = db.session.query(Players).filter(Players.id == room__.first().second).first()

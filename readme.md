@@ -21,4 +21,4 @@ pip3 install psycopg2
 ```
 
 # Status
-<p>Website project started.</p>
+<p>Website project completed.</p>

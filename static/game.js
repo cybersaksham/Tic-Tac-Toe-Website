@@ -1,3 +1,4 @@
+// Function to show error messages
 function showError($msg){
     $('#flashMsg').empty();
     $('#flashMsg').append(
@@ -11,6 +12,7 @@ function showError($msg){
     }, 3000)
 }
 
+// Function to show success messages
 function showSuccess($msg){
     $('#flashMsg').empty();
     $('#flashMsg').append(
@@ -24,6 +26,7 @@ function showSuccess($msg){
     }, 3000)
 }
 
+// Function to update HTML after socket response
 function updateHTMl($boxes, $playerID, $status, $turn){
     $.each($boxes, function(index, value){
         if($status[index] == "n"){
@@ -44,18 +47,27 @@ function updateHTMl($boxes, $playerID, $status, $turn){
     }
 }
 
+// Starting Point
 $(document).ready(function(){
+    // Making Socket
     $socket = io();
+
+    // Initializing variables
     $boxes = $('.gameBoxes');
     $url = window.location.href.split("/");
     $playerID = $('#playerID').text().split(" ")[1];
+
+    // Assigning js values
     $('#roomID').text("Room ID " + $url[$url.length - 1]);
+
+    // Clicking on boxes
     $.each($boxes, function(index, value){
         $(value).click(function(e){
             e.preventDefault();
             $socket.emit('clickBox', $url[$url.length - 1], index);
         });
     });
+    // Socket result of boc clicking
     $socket.on('click_result', function(response){
         if(response.error != null){
             if(response.errorID == $playerID){
@@ -73,31 +85,37 @@ $(document).ready(function(){
                 showSuccess("Game over. No-one won.");
             }
             else{
-                showSuccess("Game over. Opponent has won.");
+                showError("Game over. Opponent has won.");
             }
         }
     });
 
+    // Pressing delete room button
     $('#dltRoom').click(function(e){
         e.preventDefault();
         $socket.emit('dltRoom', $url[$url.length - 1])
     });
+    // Socket result of deleting room
     $socket.on('room_deleted', function(response){
         $(location).attr('href', "/");
     });
 
+    // Pressing restart game button
     $('#restartBtn').click(function(e){
         e.preventDefault();
         $socket.emit('restartGame', $url[$url.length - 1])
     });
+    // Socket result of restarting game
     $socket.on('game_restarted', function(response){
         location.reload();
     });
 
+    // Pressing quit room button
     $('#quitRoom').click(function(e){
         e.preventDefault();
         $socket.emit('quitRoom', $url[$url.length - 1])
     });
+    // Socket result of quitting room
     $socket.on('room_exited', function(response){
         if(response.id == $playerID){
             location.reload();

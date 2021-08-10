@@ -1,8 +1,10 @@
+// Function to show error
 function showError($id, $msg){
     $($id).empty();
     $($id).append($msg);
 }
 
+// Starting Point
 $(document).ready(function(){
     // Pressing create room
     $('#createRoom').click(function(e){
