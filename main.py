@@ -27,12 +27,14 @@ class Rooms(db.Model):
     second = db.Column(db.Integer)
     status = db.Column(db.String(10), nullable=False)
     turn = db.Column(db.Integer, nullable=False)
+    finished = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, first):
         self.first = first
         self.second = None
         self.status = "n" * 9
         self.turn = first
+        self.finished = False
 
 
 # Players Table
@@ -121,6 +123,21 @@ def game(roomID):
     return redirect('/')
 
 
+def gameLogic(status):
+    win_positions = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
+                     [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                     [0, 4, 8], [2, 4, 6]]
+    for item in win_positions:
+        if status[item[0]] == status[item[1]] and status[item[1]] == status[item[2]]:
+            if status[item[0]] == "X":
+                return [True, 1]
+            if status[item[0]] == "O":
+                return [True, 2]
+    if "n" in status:
+        return [False, -1]
+    return [True, 0]
+
+
 @socket.on('clickBox')
 def clickBox(id__, ind__):
     room_id__ = int(id__)
@@ -130,32 +147,57 @@ def clickBox(id__, ind__):
         player__ = session["player"]
         clicked_ind__ = int(ind__)
 
-        room_obj__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
         if room__.first == player__ or room__.second == player__:
-            if room__.turn == player__:
-                if room__.status[clicked_ind__] == "n":
-                    if player__ == room__.first:
-                        change_status = "X"
-                        change_turn = room__.second
-                    else:
-                        change_status = "O"
-                        change_turn = room__.first
-                    fin_status = ""
-                    for i in range(9):
-                        if i == clicked_ind__:
-                            fin_status += change_status
+            room_obj__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
+            if not room__.finished:
+                if room__.turn == player__:
+                    if room__.status[clicked_ind__] == "n":
+                        if player__ == room__.first:
+                            change_status = "X"
+                            change_turn = room__.second
                         else:
-                            fin_status += room__.status[i]
-                    room_obj__.update({Rooms.status: fin_status,
-                                       Rooms.turn: change_turn})
-                    db.session.commit()
-                    emit('click_result', {"result": room__.status, "error": None, "turn": room__.turn}, broadcast=True)
+                            change_status = "O"
+                            change_turn = room__.first
+                        fin_status = ""
+                        for i in range(9):
+                            if i == clicked_ind__:
+                                fin_status += change_status
+                            else:
+                                fin_status += room__.status[i]
+                        room_obj__.update({Rooms.status: fin_status,
+                                           Rooms.turn: change_turn})
+                        db.session.commit()
+                        won__, who_won__ = gameLogic(room__.status)
+                        if won__:
+                            if who_won__ == 1:
+                                who_won__ = room__.first
+                            elif who_won__ == 2:
+                                who_won__ = room__.second
+                            room_obj__.update({Rooms.finished: True})
+                            db.session.commit()
+                            emit('click_result',
+                                 {"result": room__.status, "success": who_won__, "error": None,
+                                  "turn": room__.turn},
+                                 broadcast=True)
+                        else:
+                            emit('click_result',
+                                 {"result": room__.status, "success": None, "error": None, "turn": room__.turn},
+                                 broadcast=True)
+                        return
+                    emit('click_result',
+                         {"result": None, "success": None, "error": "Cannot Click", "errorID": player__},
+                         broadcast=True)
                     return
-                emit('click_result', {"result": None, "error": "Cannot Click", "errorID": player__}, broadcast=True)
+                emit('click_result',
+                     {"result": None, "success": None, "error": "Not your turn", "errorID": player__},
+                     broadcast=True)
                 return
-            emit('click_result', {"result": None, "error": "Not your turn", "errorID": player__}, broadcast=True)
+            emit('click_result',
+                 {"result": None, "success": None, "error": "Game Overed Already", "errorID": player__},
+                 broadcast=True)
             return
-    emit('click_result', {"result": None, "error": "Not in room"}, broadcast=True)
+    emit('click_result', {"result": None, "success": None, "error": "Not in room"},
+         broadcast=True)
     return
 
 

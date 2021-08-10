@@ -3,6 +3,11 @@ function showError($msg){
     $('#errorText').append($msg);
 }
 
+function showSuccess($msg){
+    $('#successText').empty();
+    $('#successText').append($msg);
+}
+
 function updateHTMl($boxes, $playerID, $status, $turn){
     $.each($boxes, function(index, value){
         if($status[index] == "n"){
@@ -31,16 +36,8 @@ $(document).ready(function(){
         $(value).click(function(e){
             e.preventDefault();
             showError("");
+            showSuccess("");
             $socket.emit('clickBox', $url[$url.length - 1], index);
-//            $.ajax({
-//                url: 'clickBox?index='+index+'&room='+$url[$url.length - 1],
-//                method: "POST",
-//                success: function(res){
-//                    if(res["error"] != null){
-//                        showError(res["error"]);
-//                    }
-//                },
-//            });
         });
     });
     $socket.on('click_result', function(response){
@@ -52,6 +49,17 @@ $(document).ready(function(){
         }
         else{
             updateHTMl($boxes, $playerID, response.result, response.turn);
+        }
+        if(response.success != null){
+            if(response.success == $playerID){
+                showSuccess("Game over. You have won.");
+            }
+            else if(response.success == 0){
+                showSuccess("Game over. No-one won.");
+            }
+            else{
+                showSuccess("Game over. Opponent has won.");
+            }
         }
     });
 });
