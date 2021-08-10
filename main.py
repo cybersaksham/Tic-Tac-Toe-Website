@@ -104,8 +104,8 @@ def join_room():
                     return jsonify(error=None, id=room.first().id)
                 return jsonify(error="Room is full")
             return jsonify(error="No room exist")
-        except Exception as e:
-            return jsonify(error=str(e))
+        except:
+            return jsonify(error="Some error occurred")
 
 
 @app.route('/<int:roomID>')
@@ -199,6 +199,20 @@ def clickBox(id__, ind__):
     emit('click_result', {"result": None, "success": None, "error": "Not in room"},
          broadcast=True)
     return
+
+
+@socket.on('dltRoom')
+def dltRoom(id__):
+    room_id__ = int(id__)
+    room__ = db.session.query(Rooms).filter(Rooms.id == room_id__).first()
+    first__ = db.session.query(Players).filter(Players.id == room__.first).first()
+    second__ = db.session.query(Players).filter(Players.id == room__.second).first()
+    db.session.delete(first__)
+    db.session.delete(second__)
+    db.session.delete(room__)
+    db.session.commit()
+    session.pop("player")
+    emit('room_deleted', {}, broadcast=True)
 
 
 if __name__ == '__main__':

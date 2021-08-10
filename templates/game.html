@@ -20,6 +20,14 @@
             <div class="p-3 gameBoxes border bg-react">{% if box != "n" %}{{ box | safe }}{% else %}-{% endif %}</div>
         </div>
         {% endfor %}
+        <div class="row g-2">
+            <div class="col-6">
+                <button class="btn btn-primary" id="dltRoom">Close Room</button>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-primary" id="restartBtn">Restart Game</button>
+            </div>
+        </div>
         <p id="errorText" class="text-danger"></p>
         <p id="successText" class="text-success"></p>
     </div>

@@ -62,4 +62,12 @@ $(document).ready(function(){
             }
         }
     });
+
+    $('#dltRoom').click(function(e){
+        e.preventDefault();
+        $socket.emit('dltRoom', $url[$url.length - 1])
+    });
+    $socket.on('room_deleted', function(response){
+        $(location).attr('href', "/");
+    });
 });
