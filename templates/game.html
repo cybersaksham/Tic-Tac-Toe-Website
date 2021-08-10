@@ -2,11 +2,19 @@
 {% block body %}
 <div class="container">
     <div class="row g-2">
+        {% if my_turn %}
+        <p>Your Turn</p>
+        {% else %}
+        <p>Opponent's Turn</p>
+        {% endif %}
         {% for box in boxes %}
         <div class="col-4 text-center">
-            <div class="p-3 border bg-light">{% if box != "n" %}{{ box | safe }}{% endif %}</div>
+            <div class="p-3 gameBoxes border bg-react">{% if box != "n" %}{{ box | safe }}{% else %}-{% endif %}</div>
         </div>
         {% endfor %}
+        <p id="errorText" class="text-danger"></p>
     </div>
 </div>
+<!-- User JS -->
+<script src="/static/game.js"></script>
 {% endblock %}

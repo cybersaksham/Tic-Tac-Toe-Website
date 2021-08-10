@@ -114,8 +114,46 @@ def game(roomID):
             player__ = session["player"]
             if room.first == player__ or room.second == player__:
                 boxes__ = [room.status[i] for i in range(9)]
-                return render_template("game.html", boxes=boxes__)
+                my_turn = False
+                if room.turn == player__:
+                    my_turn = True
+                return render_template("game.html", boxes=boxes__, my_turn=my_turn)
     return redirect('/')
+
+
+@app.route('/clickBox', methods=["POST"])
+def clickBox():
+    if request.method == "POST":
+        if "player" in session:
+            # Getting data
+            player__ = session["player"]
+            room_id__ = int(request.args.get("room"))
+            clicked_ind__ = int(request.args.get("index"))
+
+            room__ = db.session.query(Rooms).filter(Rooms.id == room_id__).first()
+            room_obj__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
+            if room__.first == player__ or room__.second == player__:
+                if room__.turn == player__:
+                    if room__.status[clicked_ind__] == "n":
+                        if player__ == room__.first:
+                            change_status = "X"
+                            change_turn = room__.second
+                        else:
+                            change_status = "O"
+                            change_turn = room__.first
+                        fin_status = ""
+                        for i in range(9):
+                            if i == clicked_ind__:
+                                fin_status += change_status
+                            else:
+                                fin_status += room__.status[i]
+                        room_obj__.update({Rooms.status: fin_status,
+                                           Rooms.turn: change_turn})
+                        db.session.commit()
+                        return jsonify(error=None)
+                    return jsonify(error="Cannot Click")
+                return jsonify(error="Not your turn")
+        return jsonify(error="Not in room")
 
 
 if __name__ == '__main__':
