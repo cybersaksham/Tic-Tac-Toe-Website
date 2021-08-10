@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, jsonify
+from flask import Flask, render_template, redirect, request, jsonify, session
 from flask_socketio import SocketIO, emit
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -62,6 +62,9 @@ def create_room():
             db.session.add(player)
             db.session.commit()
 
+            # Adding to session storage
+            session["player"] = player.id
+
             # Making Room
             room = Rooms(player.id)
             db.session.add(room)
@@ -88,6 +91,9 @@ def join_room():
                     db.session.add(player)
                     db.session.commit()
 
+                    # Adding to session storage
+                    session["player"] = player.id
+
                     # Making Room
                     room.update({Rooms.second: player.id,
                                  Rooms.turn: player.id if room.first().turn == -1 else room.first().turn})
@@ -104,8 +110,11 @@ def join_room():
 def game(roomID):
     room = db.session.query(Rooms).filter(Rooms.id == roomID).first()
     if room is not None:
-        boxes__ = [room.status[i] for i in range(9)]
-        return render_template("game.html", boxes=boxes__)
+        if "player" in session:
+            player__ = session["player"]
+            if room.first == player__ or room.second == player__:
+                boxes__ = [room.status[i] for i in range(9)]
+                return render_template("game.html", boxes=boxes__)
     return redirect('/')
 
 
