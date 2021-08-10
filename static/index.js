@@ -21,6 +21,9 @@ $(document).ready(function(){
                     if(res["error"] != null){
                         showError('#errorTextCreate', res["error"]);
                     }
+                    else{
+                        $(location).attr('href', "/" + res["id"]);
+                    }
                 },
                 error: function(){
                     showError('#errorTextCreate', "Connection error. Try again.");
@@ -40,7 +43,23 @@ $(document).ready(function(){
             showError('#errorTextJoin', "Enter a room ID.");
         }
         else{
-            showError('#errorTextJoin', "")
+            showError('#errorTextJoin', "");
+            $.ajax({
+                url: '/join_room',
+                method: 'POST',
+                data: $('#joinForm').serialize(),
+                success: function(res){
+                    if(res["error"] != null){
+                        showError('#errorTextJoin', res["error"]);
+                    }
+                    else{
+                        $(location).attr('href', "/" + res["id"]);
+                    }
+                },
+                error: function(){
+                    showError('#errorTextJoin', "Connection error. Try again.");
+                }
+            });
         }
     });
 });

@@ -72,6 +72,34 @@ def create_room():
             return jsonify(error=str(e))
 
 
+@app.route('/join_room', methods=["POST"])
+def join_room():
+    if request.method == "POST":
+        try:
+            # Getting data from form
+            name__ = request.form["name"]
+            room__ = request.form["roomID"]
+
+            room = db.session.query(Rooms).filter(Rooms.id == room__)
+            if room.first() is not None:
+                if room.first().second is None:
+                    # Making Player
+                    player = Players(name__)
+                    db.session.add(player)
+                    db.session.commit()
+
+                    # Making Room
+                    room.update({Rooms.second: player.id,
+                                 Rooms.turn: player.id if room.first().turn == -1 else room.first().turn})
+                    db.session.commit()
+
+                    return jsonify(error=None, id=room.first().id)
+                return jsonify(error="Room is full")
+            return jsonify(error="No room exist")
+        except Exception as e:
+            return jsonify(error=str(e))
+
+
 @app.route('/<int:roomID>')
 def game(roomID):
     room = db.session.query(Rooms).filter(Rooms.id == roomID).first()
