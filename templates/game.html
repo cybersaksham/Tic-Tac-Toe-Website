@@ -2,11 +2,19 @@
 {% block body %}
 <div class="container">
     <div class="row g-2">
-        {% if my_turn %}
-        <p>Your Turn</p>
-        {% else %}
-        <p>Opponent's Turn</p>
-        {% endif %}
+        <div class="row g-2">
+            <div id="renderedTurn" class="col-6">
+                {% if my_turn %}
+                <p>Your Turn</p>
+                {% else %}
+                <p>Opponent's Turn</p>
+                {% endif %}
+            </div>
+            <div id="jsTurn" style="display: none;" class="col-6"></div>
+            <div class="col-6">
+                <p id="playerID">ID {{ player | safe }}</p>
+            </div>
+        </div>
         {% for box in boxes %}
         <div class="col-4 text-center">
             <div class="p-3 gameBoxes border bg-react">{% if box != "n" %}{{ box | safe }}{% else %}-{% endif %}</div>
@@ -16,5 +24,8 @@
     </div>
 </div>
 <!-- User JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
 <script src="/static/game.js"></script>
 {% endblock %}

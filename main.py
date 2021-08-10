@@ -117,43 +117,46 @@ def game(roomID):
                 my_turn = False
                 if room.turn == player__:
                     my_turn = True
-                return render_template("game.html", boxes=boxes__, my_turn=my_turn)
+                return render_template("game.html", boxes=boxes__, my_turn=my_turn, player=player__)
     return redirect('/')
 
 
-@app.route('/clickBox', methods=["POST"])
-def clickBox():
-    if request.method == "POST":
-        if "player" in session:
-            # Getting data
-            player__ = session["player"]
-            room_id__ = int(request.args.get("room"))
-            clicked_ind__ = int(request.args.get("index"))
+@socket.on('clickBox')
+def clickBox(id__, ind__):
+    room_id__ = int(id__)
+    room__ = db.session.query(Rooms).filter(Rooms.id == room_id__).first()
+    if "player" in session:
+        # Getting data
+        player__ = session["player"]
+        clicked_ind__ = int(ind__)
 
-            room__ = db.session.query(Rooms).filter(Rooms.id == room_id__).first()
-            room_obj__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
-            if room__.first == player__ or room__.second == player__:
-                if room__.turn == player__:
-                    if room__.status[clicked_ind__] == "n":
-                        if player__ == room__.first:
-                            change_status = "X"
-                            change_turn = room__.second
+        room_obj__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
+        if room__.first == player__ or room__.second == player__:
+            if room__.turn == player__:
+                if room__.status[clicked_ind__] == "n":
+                    if player__ == room__.first:
+                        change_status = "X"
+                        change_turn = room__.second
+                    else:
+                        change_status = "O"
+                        change_turn = room__.first
+                    fin_status = ""
+                    for i in range(9):
+                        if i == clicked_ind__:
+                            fin_status += change_status
                         else:
-                            change_status = "O"
-                            change_turn = room__.first
-                        fin_status = ""
-                        for i in range(9):
-                            if i == clicked_ind__:
-                                fin_status += change_status
-                            else:
-                                fin_status += room__.status[i]
-                        room_obj__.update({Rooms.status: fin_status,
-                                           Rooms.turn: change_turn})
-                        db.session.commit()
-                        return jsonify(error=None)
-                    return jsonify(error="Cannot Click")
-                return jsonify(error="Not your turn")
-        return jsonify(error="Not in room")
+                            fin_status += room__.status[i]
+                    room_obj__.update({Rooms.status: fin_status,
+                                       Rooms.turn: change_turn})
+                    db.session.commit()
+                    emit('click_result', {"result": room__.status, "error": None, "turn": room__.turn}, broadcast=True)
+                    return
+                emit('click_result', {"result": None, "error": "Cannot Click", "errorID": player__}, broadcast=True)
+                return
+            emit('click_result', {"result": None, "error": "Not your turn", "errorID": player__}, broadcast=True)
+            return
+    emit('click_result', {"result": None, "error": "Not in room"}, broadcast=True)
+    return
 
 
 if __name__ == '__main__':
