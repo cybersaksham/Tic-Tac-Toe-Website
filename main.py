@@ -49,6 +49,8 @@ class Players(db.Model):
 
 @app.route('/')
 def home():
+    if "player" in session:
+        session.pop("player")
     return render_template("index.html")
 
 
@@ -117,6 +119,7 @@ def game(roomID):
     room = db.session.query(Rooms).filter(Rooms.id == roomID).first()
     if room is not None:
         if "player" in session:
+            print(session["player"])
             player__ = session["player"]
             if room.first == player__ or room.second == player__:
                 boxes__ = [room.status[i] for i in range(9)]
@@ -216,7 +219,8 @@ def dltRoom(id__):
     first__ = db.session.query(Players).filter(Players.id == room__.first).first()
     second__ = db.session.query(Players).filter(Players.id == room__.second).first()
     db.session.delete(first__)
-    db.session.delete(second__)
+    if second__ is not None:
+        db.session.delete(second__)
     db.session.delete(room__)
     db.session.commit()
     session.pop("player")
@@ -231,6 +235,21 @@ def restartGame(id__):
                    Rooms.finished: False})
     db.session.commit()
     emit('game_restarted', {}, broadcast=True)
+
+
+@socket.on('quitRoom')
+def quitRoom(id__):
+    room_id__ = int(id__)
+    room__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
+    second__ = db.session.query(Players).filter(Players.id == room__.first().second).first()
+    room__.update({Rooms.status: "n" * 9, Rooms.turn: room__.first().first,
+                   Rooms.finished: False, Rooms.second: None})
+    second_id__ = second__.id
+    second_name__ = second__.name
+    db.session.delete(second__)
+    db.session.commit()
+    session.pop("player")
+    emit('room_exited', {"msg": f"{second_name__} Left", "id": second_id__}, broadcast=True)
 
 
 if __name__ == '__main__':

@@ -48,6 +48,7 @@ $(document).ready(function(){
     $socket = io();
     $boxes = $('.gameBoxes');
     $url = window.location.href.split("/");
+    $playerID = $('#playerID').text().split(" ")[1];
     $('#roomID').text("Room ID " + $url[$url.length - 1]);
     $.each($boxes, function(index, value){
         $(value).click(function(e){
@@ -56,7 +57,6 @@ $(document).ready(function(){
         });
     });
     $socket.on('click_result', function(response){
-        $playerID = $('#playerID').text().split(" ")[1];
         if(response.error != null){
             if(response.errorID == $playerID){
                 showError(response.error);
@@ -92,5 +92,19 @@ $(document).ready(function(){
     });
     $socket.on('game_restarted', function(response){
         location.reload();
+    });
+
+    $('#quitRoom').click(function(e){
+        e.preventDefault();
+        $socket.emit('quitRoom', $url[$url.length - 1])
+    });
+    $socket.on('room_exited', function(response){
+        if(response.id == $playerID){
+            location.reload();
+        }
+        else{
+            showError(response.msg);
+            updateHTMl($boxes, $playerID, "nnnnnnnnn", $playerID);
+        }
     });
 });
