@@ -54,7 +54,14 @@ class Players(db.Model):
 @app.route('/')
 def home():
     if "player" in session:
-        session.pop("player")
+        room_f__ = db.session.query(Rooms).filter(Rooms.first == session["player"]).first()
+        room_s__ = db.session.query(Rooms).filter(Rooms.second == session["player"]).first()
+        if room_f__ is not None:
+            return redirect(f"/{room_f__.id}")
+        elif room_s__ is not None:
+            return redirect(f"/{room_s__.id}")
+        else:
+            session.pop('player')
     return render_template("index.html")
 
 

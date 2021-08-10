@@ -118,7 +118,7 @@ $(document).ready(function(){
     // Socket result of quitting room
     $socket.on('room_exited', function(response){
         if(response.id == $playerID){
-            location.reload();
+            $(location).attr('href', "/");
         }
         else{
             showError(response.msg);
