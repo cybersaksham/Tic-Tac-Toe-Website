@@ -117,9 +117,12 @@ def game(roomID):
             if room.first == player__ or room.second == player__:
                 boxes__ = [room.status[i] for i in range(9)]
                 my_turn = False
+                is_owner = False
                 if room.turn == player__:
                     my_turn = True
-                return render_template("game.html", boxes=boxes__, my_turn=my_turn, player=player__)
+                if room.first == player__:
+                    is_owner = True
+                return render_template("game.html", boxes=boxes__, my_turn=my_turn, player=player__, owner=is_owner)
     return redirect('/')
 
 
