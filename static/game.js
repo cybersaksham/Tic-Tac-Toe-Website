@@ -2,7 +2,7 @@ function showError($msg){
     $('#flashMsg').empty();
     $('#flashMsg').append(
     "<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\">"+
-    "<strong>" + $msg + "</strong>."+
+    "<strong>" + $msg + "</strong>"+
     "<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\""+
     "aria-label=\"Close\"></button>"+
     "</div>");

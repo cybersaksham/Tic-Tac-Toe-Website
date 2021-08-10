@@ -73,8 +73,8 @@ def create_room():
             db.session.commit()
 
             return jsonify(error=None, id=room.id)
-        except Exception as e:
-            return jsonify(error=str(e))
+        except:
+            return jsonify(error="Some error occurred")
 
 
 @app.route('/join_room', methods=["POST"])
@@ -188,18 +188,19 @@ def clickBox(id__, ind__):
                                  broadcast=True)
                         return
                     emit('click_result',
-                         {"result": None, "success": None, "error": "Cannot Click", "errorID": player__},
+                         {"result": None, "success": None, "error": "Click on empty box", "errorID": player__},
                          broadcast=True)
                     return
                 emit('click_result',
-                     {"result": None, "success": None, "error": "Not your turn", "errorID": player__},
+                     {"result": None, "success": None, "error": "Click when your turn comes", "errorID": player__},
                      broadcast=True)
                 return
             emit('click_result',
-                 {"result": None, "success": None, "error": "Game Overed Already", "errorID": player__},
+                 {"result": None, "success": None, "error": "Game is overed. Restart to play again.",
+                  "errorID": player__},
                  broadcast=True)
             return
-    emit('click_result', {"result": None, "success": None, "error": "Not in room"},
+    emit('click_result', {"result": None, "success": None, "error": "You are not present in room"},
          broadcast=True)
     return
 
