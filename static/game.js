@@ -32,6 +32,7 @@ $(document).ready(function(){
     $socket = io();
     $boxes = $('.gameBoxes');
     $url = window.location.href.split("/");
+    $('#roomID').text("Room ID " + $url[$url.length - 1]);
     $.each($boxes, function(index, value){
         $(value).click(function(e){
             e.preventDefault();

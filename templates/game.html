@@ -3,15 +3,18 @@
 <div class="container">
     <div class="row g-2">
         <div class="row g-2">
-            <div id="renderedTurn" class="col-6">
+            <div id="renderedTurn" class="col-4">
                 {% if my_turn %}
                 <p>Your Turn</p>
                 {% else %}
                 <p>Opponent's Turn</p>
                 {% endif %}
             </div>
-            <div id="jsTurn" style="display: none;" class="col-6"></div>
-            <div class="col-6">
+            <div id="jsTurn" style="display: none;" class="col-4"></div>
+            <div class="col-4">
+                <p id="roomID"></p>
+            </div>
+            <div class="col-4">
                 <p id="playerID">ID {{ player | safe }}</p>
             </div>
         </div>
