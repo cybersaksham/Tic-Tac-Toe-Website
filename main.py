@@ -55,57 +55,61 @@ def home():
 @app.route('/create_room', methods=["POST"])
 def create_room():
     if request.method == "POST":
-        try:
-            # Getting data from form
-            name__ = request.form["name"]
+        if "player" not in session:
+            try:
+                # Getting data from form
+                name__ = request.form["name"]
 
-            # Making Player
-            player = Players(name__)
-            db.session.add(player)
-            db.session.commit()
+                # Making Player
+                player = Players(name__)
+                db.session.add(player)
+                db.session.commit()
 
-            # Adding to session storage
-            session["player"] = player.id
+                # Adding to session storage
+                session["player"] = player.id
 
-            # Making Room
-            room = Rooms(player.id)
-            db.session.add(room)
-            db.session.commit()
+                # Making Room
+                room = Rooms(player.id)
+                db.session.add(room)
+                db.session.commit()
 
-            return jsonify(error=None, id=room.id)
-        except:
-            return jsonify(error="Some error occurred")
+                return jsonify(error=None, id=room.id)
+            except:
+                return jsonify(error="Some error occurred")
+        return jsonify(error="You can join only one game at a time")
 
 
 @app.route('/join_room', methods=["POST"])
 def join_room():
     if request.method == "POST":
-        try:
-            # Getting data from form
-            name__ = request.form["name"]
-            room__ = request.form["roomID"]
+        if "player" not in session:
+            try:
+                # Getting data from form
+                name__ = request.form["name"]
+                room__ = request.form["roomID"]
 
-            room = db.session.query(Rooms).filter(Rooms.id == room__)
-            if room.first() is not None:
-                if room.first().second is None:
-                    # Making Player
-                    player = Players(name__)
-                    db.session.add(player)
-                    db.session.commit()
+                room = db.session.query(Rooms).filter(Rooms.id == room__)
+                if room.first() is not None:
+                    if room.first().second is None:
+                        # Making Player
+                        player = Players(name__)
+                        db.session.add(player)
+                        db.session.commit()
 
-                    # Adding to session storage
-                    session["player"] = player.id
+                        # Adding to session storage
+                        session["player"] = player.id
 
-                    # Making Room
-                    room.update({Rooms.second: player.id,
-                                 Rooms.turn: player.id if room.first().turn == -1 else room.first().turn})
-                    db.session.commit()
+                        # Making Room
+                        room.update({Rooms.second: player.id,
+                                     Rooms.turn: player.id if room.first().turn == -1 else room.first().turn})
+                        db.session.commit()
 
-                    return jsonify(error=None, id=room.first().id)
-                return jsonify(error="Room is full")
-            return jsonify(error="No room exist")
-        except:
-            return jsonify(error="Some error occurred")
+                        return jsonify(error=None, id=room.first().id)
+                    return jsonify(error="Room is full")
+                return jsonify(error="No room exist")
+            except:
+                return jsonify(error="Some error occurred")
+        return jsonify(error="You can join only one game at a time")
 
 
 @app.route('/<int:roomID>')
