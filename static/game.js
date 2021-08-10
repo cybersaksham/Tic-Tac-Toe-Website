@@ -1,11 +1,27 @@
 function showError($msg){
-    $('#errorText').empty();
-    $('#errorText').append($msg);
+    $('#flashMsg').empty();
+    $('#flashMsg').append(
+    "<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\">"+
+    "<strong>" + $msg + "</strong>."+
+    "<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\""+
+    "aria-label=\"Close\"></button>"+
+    "</div>");
+    setTimeout(function () {
+        $('#flashMsg').empty();
+    }, 3000)
 }
 
 function showSuccess($msg){
-    $('#successText').empty();
-    $('#successText').append($msg);
+    $('#flashMsg').empty();
+    $('#flashMsg').append(
+    "<div class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">"+
+    "<strong>" + $msg + "</strong>."+
+    "<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\""+
+    "aria-label=\"Close\"></button>"+
+    "</div>");
+    setTimeout(function () {
+        $('#flashMsg').empty();
+    }, 3000)
 }
 
 function updateHTMl($boxes, $playerID, $status, $turn){
@@ -36,8 +52,6 @@ $(document).ready(function(){
     $.each($boxes, function(index, value){
         $(value).click(function(e){
             e.preventDefault();
-            showError("");
-            showSuccess("");
             $socket.emit('clickBox', $url[$url.length - 1], index);
         });
     });
