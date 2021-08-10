@@ -179,7 +179,7 @@ def clickBox(id__, ind__):
                     if room__.status[clicked_ind__] == "n":
                         if player__ == room__.first:
                             change_status = "X"
-                            change_turn = room__.second
+                            change_turn = room__.second if room__.second is not None else -1
                         else:
                             change_status = "O"
                             change_turn = room__.first
