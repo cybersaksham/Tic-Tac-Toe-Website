@@ -215,5 +215,15 @@ def dltRoom(id__):
     emit('room_deleted', {}, broadcast=True)
 
 
+@socket.on('restartGame')
+def restartGame(id__):
+    room_id__ = int(id__)
+    room__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
+    room__.update({Rooms.status: "n" * 9, Rooms.turn: room__.first().first,
+                   Rooms.finished: False})
+    db.session.commit()
+    emit('game_restarted', {}, broadcast=True)
+
+
 if __name__ == '__main__':
     socket.run(app, debug=data["debug"])

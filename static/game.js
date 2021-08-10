@@ -70,4 +70,12 @@ $(document).ready(function(){
     $socket.on('room_deleted', function(response){
         $(location).attr('href', "/");
     });
+
+    $('#restartBtn').click(function(e){
+        e.preventDefault();
+        $socket.emit('restartGame', $url[$url.length - 1])
+    });
+    $socket.on('game_restarted', function(response){
+        location.reload();
+    });
 });
