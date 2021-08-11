@@ -59,6 +59,18 @@ $(document).ready(function(){
 
     // Assigning js values
     $('#roomID').text("Room ID " + $url[$url.length - 1]);
+	
+	// On connecting
+	$socket.on('connect', function(){
+		$socket.emit('joinedRoom', $url[$url.length - 1], $playerID);
+	});
+	$socket.on('join_msg', function(response){
+		if(response.roomID == $url[$url.length - 1]){
+			if(response.msg != null){
+				showSuccess(response.msg);
+			}
+		}
+	});
 
     // Clicking on boxes
     $.each($boxes, function(index, value){

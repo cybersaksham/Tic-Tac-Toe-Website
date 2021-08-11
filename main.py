@@ -31,6 +31,7 @@ class Rooms(db.Model):
     status = db.Column(db.String(10), nullable=False)
     turn = db.Column(db.Integer, nullable=False)
     finished = db.Column(db.Boolean, nullable=False)
+    joined = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, first):
         self.first = first
@@ -38,6 +39,7 @@ class Rooms(db.Model):
         self.status = "n" * 9
         self.turn = first
         self.finished = False
+        self.joined = False
 
 
 # Players Table
@@ -261,7 +263,7 @@ def quitRoom(id__):
     room__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
     second__ = db.session.query(Players).filter(Players.id == room__.first().second).first()
     room__.update({Rooms.status: "n" * 9, Rooms.turn: room__.first().first,
-                   Rooms.finished: False, Rooms.second: None})
+                   Rooms.finished: False, Rooms.second: None, Rooms.joined: False})
     second_id__ = second__.id
     second_name__ = second__.name
     db.session.delete(second__)
@@ -269,6 +271,20 @@ def quitRoom(id__):
     session.pop("player")
     emit('room_exited', {"msg": f"{second_name__} Left", "id": second_id__, "roomID": id__}, broadcast=True)
 
+
+@socket.on('joinedRoom')
+def joinedRoom(id__, player__):
+    # Joining Room Message Flash
+    room_id__ = int(id__)
+    room__ = db.session.query(Rooms).filter(Rooms.id == room_id__)
+    first__ = db.session.query(Players).filter(Players.id == room__.first().first).first()
+    if room__.first().joined or int(player__) == first__.id or room__.first().second is None:
+        emit('join_msg', {"msg": None, "roomID": id__}, broadcast=True)
+    else:
+        second__ = db.session.query(Players).filter(Players.id == room__.first().second).first()
+        room__.update({Rooms.joined: True})
+        db.session.commit()
+        emit('join_msg', {"msg": f"{second__.name} Joined", "roomID": id__}, broadcast=True)
 
 if __name__ == '__main__':
     socket.run(app, debug=data["debug"])
