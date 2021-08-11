@@ -67,27 +67,29 @@ $(document).ready(function(){
             $socket.emit('clickBox', $url[$url.length - 1], index);
         });
     });
-    // Socket result of boc clicking
+    // Socket result of box clicking
     $socket.on('click_result', function(response){
-        if(response.error != null){
-            if(response.errorID == $playerID){
-                showError(response.error);
-            }
-        }
-        else{
-            updateHTMl($boxes, $playerID, response.result, response.turn);
-        }
-        if(response.success != null){
-            if(response.success == $playerID){
-                showSuccess("Game over. You have won.");
-            }
-            else if(response.success == 0){
-                showSuccess("Game over. No-one won.");
-            }
-            else{
-                showError("Game over. Opponent has won.");
-            }
-        }
+        if(response.roomID == $url[$url.length - 1]){
+			if(response.error != null){
+				if(response.errorID == $playerID){
+					showError(response.error);
+				}
+			}
+			else{
+				updateHTMl($boxes, $playerID, response.result, response.turn);
+			}
+			if(response.success != null){
+				if(response.success == $playerID){
+					showSuccess("Game over. You have won.");
+				}
+				else if(response.success == 0){
+					showSuccess("Game over. No-one won.");
+				}
+				else{
+					showError("Game over. Opponent has won.");
+				}
+			}
+		}
     });
 
     // Pressing delete room button
@@ -97,7 +99,9 @@ $(document).ready(function(){
     });
     // Socket result of deleting room
     $socket.on('room_deleted', function(response){
-        $(location).attr('href', "/");
+		if(response.roomID == $url[$url.length - 1]){
+			$(location).attr('href', "/");
+		}
     });
 
     // Pressing restart game button
@@ -107,7 +111,9 @@ $(document).ready(function(){
     });
     // Socket result of restarting game
     $socket.on('game_restarted', function(response){
-        location.reload();
+		if(response.roomID == $url[$url.length - 1]){
+			location.reload();
+		}
     });
 
     // Pressing quit room button
@@ -117,12 +123,14 @@ $(document).ready(function(){
     });
     // Socket result of quitting room
     $socket.on('room_exited', function(response){
-        if(response.id == $playerID){
-            $(location).attr('href', "/");
-        }
-        else{
-            showError(response.msg);
-            updateHTMl($boxes, $playerID, "nnnnnnnnn", $playerID);
-        }
+		if(response.roomID == $url[$url.length - 1]){
+			if(response.id == $playerID){
+				$(location).attr('href', "/");
+			}
+			else{
+				showError(response.msg);
+				updateHTMl($boxes, $playerID, "nnnnnnnnn", $playerID);
+			}
+		}
     });
 });

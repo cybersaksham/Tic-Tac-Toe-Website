@@ -202,27 +202,27 @@ def clickBox(id__, ind__):
                             db.session.commit()
                             emit('click_result',
                                  {"result": room__.status, "success": who_won__, "error": None,
-                                  "turn": room__.turn},
+                                  "turn": room__.turn, "roomID": id__},
                                  broadcast=True)
                         else:
                             emit('click_result',
-                                 {"result": room__.status, "success": None, "error": None, "turn": room__.turn},
+                                 {"result": room__.status, "success": None, "error": None, "turn": room__.turn, "roomID": id__},
                                  broadcast=True)
                         return
                     emit('click_result',
-                         {"result": None, "success": None, "error": "Click on empty box", "errorID": player__},
+                         {"result": None, "success": None, "error": "Click on empty box", "errorID": player__, "roomID": id__},
                          broadcast=True)
                     return
                 emit('click_result',
-                     {"result": None, "success": None, "error": "Click when your turn comes", "errorID": player__},
+                     {"result": None, "success": None, "error": "Click when your turn comes", "errorID": player__, "roomID": id__},
                      broadcast=True)
                 return
             emit('click_result',
                  {"result": None, "success": None, "error": "Game is overed. Restart to play again.",
-                  "errorID": player__},
+                  "errorID": player__, "roomID": id__},
                  broadcast=True)
             return
-    emit('click_result', {"result": None, "success": None, "error": "You are not present in room"},
+    emit('click_result', {"result": None, "success": None, "error": "You are not present in room", "roomID": id__},
          broadcast=True)
     return
 
@@ -240,7 +240,7 @@ def dltRoom(id__):
     db.session.delete(room__)
     db.session.commit()
     session.pop("player")
-    emit('room_deleted', {}, broadcast=True)
+    emit('room_deleted', {"roomID": id__}, broadcast=True)
 
 
 @socket.on('restartGame')
@@ -251,7 +251,7 @@ def restartGame(id__):
     room__.update({Rooms.status: "n" * 9, Rooms.turn: room__.first().first,
                    Rooms.finished: False})
     db.session.commit()
-    emit('game_restarted', {}, broadcast=True)
+    emit('game_restarted', {"roomID": id__}, broadcast=True)
 
 
 @socket.on('quitRoom')
@@ -267,7 +267,7 @@ def quitRoom(id__):
     db.session.delete(second__)
     db.session.commit()
     session.pop("player")
-    emit('room_exited', {"msg": f"{second_name__} Left", "id": second_id__}, broadcast=True)
+    emit('room_exited', {"msg": f"{second_name__} Left", "id": second_id__, "roomID": id__}, broadcast=True)
 
 
 if __name__ == '__main__':
