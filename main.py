@@ -287,4 +287,4 @@ def joinedRoom(id__, player__):
         emit('join_msg', {"msg": f"{second__.name} Joined", "roomID": id__}, broadcast=True)
 
 if __name__ == '__main__':
-    socket.run(app, debug=data["debug"], port=33507)
+    socket.run(app, debug=data["debug"], host='0.0.0.0', port=33507)
