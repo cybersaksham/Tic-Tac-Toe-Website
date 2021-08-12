@@ -18,7 +18,6 @@ else:
     app.secret_key = os.environ.get('SECRET_KEY', None)
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', None). \
                                                 replace("postgres", "postgresql") + "?sslmode=require"
-port = int(os.environ.get('PORT', 5000))
 db = SQLAlchemy(app)
 socket = SocketIO(app)
 
@@ -288,4 +287,4 @@ def joinedRoom(id__, player__):
         emit('join_msg', {"msg": f"{second__.name} Joined", "roomID": id__}, broadcast=True)
 
 if __name__ == '__main__':
-    socket.run(app, debug=data["debug"], host='0.0.0.0', port=port)
+    socket.run(app, debug=data["debug"], host='0.0.0.0', port=3000)

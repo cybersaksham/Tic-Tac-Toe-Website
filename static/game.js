@@ -50,7 +50,7 @@ function updateHTMl($boxes, $playerID, $status, $turn){
 // Starting Point
 $(document).ready(function(){
     // Making Socket
-    $socket = io();
+    $socket = io(window.location.href + ':3000');
 
     // Initializing variables
     $boxes = $('.gameBoxes');
