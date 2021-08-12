@@ -20,6 +20,7 @@ else:
                                                 replace("postgres", "postgresql") + "?sslmode=require"
 db = SQLAlchemy(app)
 socket = SocketIO(app)
+socket.init_app(app, cors_allowed_origins="*")
 
 
 # Rooms Table
