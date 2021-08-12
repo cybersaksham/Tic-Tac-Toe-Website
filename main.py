@@ -19,7 +19,7 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', None). \
                                                 replace("postgres", "postgresql") + "?sslmode=require"
 db = SQLAlchemy(app)
-socket = SocketIO(app)
+socket = SocketIO(app, logger=True, engineio_logger=True)
 socket.init_app(app, cors_allowed_origins="*")
 
 
